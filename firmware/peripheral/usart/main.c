@@ -1,4 +1,13 @@
 #include <stm32f4xx.h>
+#include <stm32f4xx_rcc.h>
+#include <stm32f4xx_gpio.h>
+#include <stm32f4xx_usart.h>
+
+struct zhc
+{
+	float num;
+	char delim;
+};
 
 void delay(uint32_t count)
 {
@@ -54,21 +63,24 @@ void usart_putc(char data)
 	while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
 }
 
-void usart_puts(char *string)
+void usart_puts(struct zhc *ptr)
 {
-	for(; *string != '\0'; string++) {
-		usart_putc(*string);
+	char *ch =  ( ( ( char * )( & ( ptr->num ) ) ) );
+	for(int i =0;i<4;i++)
+	{
+		usart_putc( *ch );
+		ch++;
 	}
+	usart_putc( ptr->delim );
 }
-
 int main()
 {
 	usart3_init();
+	struct zhc z = {26.4000,165};
 
-	usart_puts("STM32: Hello World!\n\r");
-
-
-	while(1) {
+	while(1) 
+	{
+		usart_puts(&z);
 		char received_data = usart_getc();
 
 		usart_putc(received_data);
