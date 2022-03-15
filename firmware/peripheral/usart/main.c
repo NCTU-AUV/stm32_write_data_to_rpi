@@ -75,16 +75,55 @@ void usart_puts(struct zhc *ptr)
 }
 int main()
 {
+	char receieved;
+	int receieved_number = 0;
 	usart3_init();
 	struct zhc z = {26.4000,165};
 
 	while(1) 
 	{
-		usart_puts(&z);
-		char received_data = usart_getc();
+		receieved =usart_getc();
 
-		usart_putc(received_data);
+		if(receieved == '\n')
+		{
+			receieved_number = convert_to_int( &receieved_number);
+		}
+	//	usart_puts(&z);
+	//	usart_putc(received_data);
 	}
-
 	return 0;
 }
+
+int convert_to_int()
+{	
+	int i,n;
+    char *ch = (char *) &n;
+	
+		for(i =0;i<4;i++)
+		{
+			ch[i] = usart_getc();
+		}	
+	if(n>0)
+ 		usart_putc(64+n);
+	return n;
+}
+
+/*int convert_to_int(int* number)
+{	
+	int i,n;
+    char *ch = (char *) &n;
+	
+	while(*ch != '\n')
+	{
+		for(i =0;i<4;i++)
+		{
+			ch[i] = usart_getc();
+		}
+		*number = *ch;	
+		if(*number>0)
+		{
+			usart_putc('z');
+		}
+
+	}
+}*/
