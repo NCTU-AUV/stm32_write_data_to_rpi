@@ -73,57 +73,66 @@ void usart_puts(struct zhc *ptr)
 	}
 	usart_putc( ptr->delim );
 }
+
+float convert_to_number()
+{	
+	int i;
+	float n;
+    char *ch = (char *) &n;
+	
+	for(i =0;i<4;i++)
+		ch[i] = usart_getc();
+	return n;
+}
+
+void deliver_number(float *f)
+{
+	char * ch = (char*) f;
+	usart_putc('\n');
+
+	for(int i =0;i<100;i++)
+	{
+		for(int j=0;j<4;j++)
+		{
+			usart_putc( *ch );
+			ch++;
+		}
+	}
+}
 int main()
 {
-	char receieved;
-	int receieved_number = 0;
+	int i;
+	char receieved_ch;
+	float receieved_number[100] = { 1.1 };
+
 	usart3_init();
 	struct zhc z = {26.4000,165};
 
 	while(1) 
 	{
-		receieved =usart_getc();
+		receieved_ch =usart_getc();
 
-		if(receieved == '\n')
+		if(receieved_ch == '\n')
 		{
-			receieved_number = convert_to_int( &receieved_number);
+			for(i=0;i<100;i++)
+				receieved_number[i] = convert_to_number(); //convert one number for one time
+			deliver_number( receieved_number ); //deliver 100 number for one time
+
+		/*	float temp = 1.5;
+			char* c = (char*)&temp;
+			usart_putc('\n');
+			for(int k=0;k<100;k++)
+			{
+				for(int r=0;r<4;r++)
+				{
+					usart_putc( *c );
+					c++;
+				}
+				c = (char*)&temp;
+			}*/
 		}
 	//	usart_puts(&z);
 	//	usart_putc(received_data);
 	}
 	return 0;
 }
-
-int convert_to_int()
-{	
-	int i,n;
-    char *ch = (char *) &n;
-	
-		for(i =0;i<4;i++)
-		{
-			ch[i] = usart_getc();
-		}	
-	if(n>0)
- 		usart_putc(64+n);
-	return n;
-}
-
-/*int convert_to_int(int* number)
-{	
-	int i,n;
-    char *ch = (char *) &n;
-	
-	while(*ch != '\n')
-	{
-		for(i =0;i<4;i++)
-		{
-			ch[i] = usart_getc();
-		}
-		*number = *ch;	
-		if(*number>0)
-		{
-			usart_putc('z');
-		}
-
-	}
-}*/
