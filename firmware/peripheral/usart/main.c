@@ -88,6 +88,7 @@ float convert_to_number()
 void deliver_number(float *f)
 {
 	char * ch = (char*) f;
+	
 	usart_putc('\n');
 
 	for(int i =0;i<100;i++)
