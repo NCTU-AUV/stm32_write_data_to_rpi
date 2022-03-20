@@ -81,30 +81,42 @@ float convert_to_number()
     char *ch = (char *) &n;
 	
 	for(i =0;i<4;i++)
+	{
 		ch[i] = usart_getc();
+	//	ch++;
+	}
 	return n;
 }
 
-void deliver_number(float *f)
+/*void deliver_number(char *ch)
 {
-	char * ch = (char*) f;
-	
-	usart_putc('\n');
-
-	for(int i =0;i<100;i++)
+	for(int j=0;j<4;j++)
 	{
-		for(int j=0;j<4;j++)
-		{
-			usart_putc( *ch );
-			ch++;
-		}
+		usart_putc( *ch );
+		ch++;
+	}
+}*/
+
+void deliver_number(float f)
+{
+	char* ch = (char*)&f;
+
+	for(int j=0;j<4;j++)
+	{
+		usart_putc( *ch );
+		ch++;
 	}
 }
+
 int main()
 {
 	int i;
 	char receieved_ch;
-	float receieved_number[100] = { 1.1 };
+	float temp;
+	float receieved_number[100];
+
+	for(i=0;i<100;i++)
+		receieved_number[i] = 1.0*i;
 
 	usart3_init();
 	struct zhc z = {26.4000,165};
@@ -114,12 +126,26 @@ int main()
 		receieved_ch =usart_getc();
 
 		if(receieved_ch == '\n')
-		{
 			for(i=0;i<100;i++)
-				receieved_number[i] = convert_to_number(); //convert one number for one time
-			deliver_number( receieved_number ); //deliver 100 number for one time
+				receieved_number[i] = 2*convert_to_number(); //convert one number for one time
+				
 
-		/*	float temp = 1.5;
+		//deliver data to rpi
+		usart_putc('\n');
+		for(i=0;i<100;i++)
+		{
+			temp = receieved_number[i];
+		//	deliver_number( (char*)&temp ); 
+			deliver_number( temp ); 
+		}
+	}
+	return 0;
+}
+
+
+
+
+	/*float temp = 1.5;
 			char* c = (char*)&temp;
 			usart_putc('\n');
 			for(int k=0;k<100;k++)
@@ -131,9 +157,3 @@ int main()
 				}
 				c = (char*)&temp;
 			}*/
-		}
-	//	usart_puts(&z);
-	//	usart_putc(received_data);
-	}
-	return 0;
-}
